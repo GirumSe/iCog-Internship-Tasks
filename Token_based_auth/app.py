@@ -4,9 +4,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 import os
+import re
 from dotenv import load_dotenv
 
-load_dotenv() 
+load_dotenv()  # Load environment variables from .env file
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -26,13 +27,30 @@ def create_token(identity, expires_in=600):
     token = jwt.encode({'identity': identity, 'exp': expiration}, app.config['SECRET_KEY'], algorithm='HS256')
     return token
 
+def validate_password(password):
+    """Enforce strong password policies."""
+    if len(password) < 8:
+        return False, "Password must be at least 8 characters long"
+    if not re.search(r"[A-Z]", password):
+        return False, "Password must contain at least one uppercase letter"
+    if not re.search(r"[a-z]", password):
+        return False, "Password must contain at least one lowercase letter"
+    if not re.search(r"\d", password):
+        return False, "Password must contain at least one digit"
+    return True, "Password is strong"
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
     if User.query.filter_by(email=data['email']).first():
         return jsonify({'message': 'User already exists'}), 400
-    
-    hashed_password = generate_password_hash(data['password'], method='sha256')
+
+    password = data['password']
+    is_valid, message = validate_password(password)
+    if not is_valid:
+        return jsonify({'message': message}), 400
+
+    hashed_password = generate_password_hash(password, method='sha256')
     new_user = User(name=data['name'], email=data['email'], password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
