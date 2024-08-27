@@ -8,6 +8,7 @@ import re
 from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from werkzeug.security import escape
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -22,7 +23,7 @@ db = SQLAlchemy(app)
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"] 
+    default_limits=["200 per day", "50 per hour"]
 )
 
 # Define a pepper value
@@ -53,6 +54,17 @@ def validate_password(password):
         return False, "Password must contain at least one special character"
     return True, "Password is strong"
 
+def validate_email_address(email):
+    """Validate the email address format using regex."""
+    email_regex = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+    if email_regex.match(email):
+        return True, "Valid email address"
+    return False, "Invalid email address format"
+
+def sanitize_input(input_value):
+    """Sanitize user input to prevent injection attacks."""
+    return escape(input_value)
+
 def hash_password(password):
     """Hash the password with bcrypt and a pepper."""
     salt = bcrypt.gensalt(rounds=12)  # Work factor of 12 is generally considered secure
@@ -67,16 +79,25 @@ def check_password(stored_password, provided_password):
 @limiter.limit("5 per minute")  # Apply rate limit to this route
 def register():
     data = request.get_json()
-    if User.query.filter_by(email=data['email']).first():
+    
+    # Validate and sanitize input
+    name = sanitize_input(data.get('name', ''))
+    email = sanitize_input(data.get('email', ''))
+    password = sanitize_input(data.get('password', ''))
+
+    is_valid_email, message = validate_email_address(email)
+    if not is_valid_email:
+        return jsonify({'message': message}), 400
+
+    if User.query.filter_by(email=email).first():
         return jsonify({'message': 'User already exists'}), 400
 
-    password = data['password']
-    is_valid, message = validate_password(password)
-    if not is_valid:
+    is_valid_password, message = validate_password(password)
+    if not is_valid_password:
         return jsonify({'message': message}), 400
 
     hashed_password = hash_password(password)
-    new_user = User(name=data['name'], email=data['email'], password=hashed_password)
+    new_user = User(name=name, email=email, password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'message': 'User registered successfully'}), 201
@@ -85,9 +106,14 @@ def register():
 @limiter.limit("10 per minute")  # Apply rate limit to this route
 def login():
     data = request.get_json()
-    user = User.query.filter_by(email=data['email']).first()
+
+    # Validate and sanitize input
+    email = sanitize_input(data.get('email', ''))
+    password = sanitize_input(data.get('password', ''))
+
+    user = User.query.filter_by(email=email).first()
     
-    if not user or not check_password(user.password, data['password']):
+    if not user or not check_password(user.password, password):
         return jsonify({'message': 'Invalid credentials'}), 401
     
     access_token = create_token(identity=user.email)
