@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const csrfToken = getCookie('csrf_token');
-
+    console.log("CSRF Token:", csrfToken);
     // Login form submission
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     localStorage.setItem('access_token', data.access_token);
                     localStorage.setItem('refresh_token', data.refresh_token);
                     // Redirect to profile page
-                    window.location.href = 'profile.html';
+                    window.location.href = 'profile';
                 } else {
                     // Display error message
                     document.getElementById('message').innerText = data.message;
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 if (data.message === 'User registered successfully') {
                     // Redirect to login page
-                    window.location.href = 'login.html';
+                    window.location.href = 'login';
                 } else {
                     // Display error message
                     document.getElementById('message').innerText = data.message;
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const accessToken = localStorage.getItem('access_token');
         if (!accessToken) {
             // Redirect to login page if no token
-            window.location.href = 'login.html';
+            window.location.href = 'login';
         } else {
             fetch('/profile', {
                 headers: {
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 if (data.message === 'Token has expired' || data.message === 'Invalid token') {
                     // Redirect to login if token is invalid
-                    window.location.href = 'login.html';
+                    window.location.href = 'login';
                 } else {
                     // Display user info
                     profileInfo.innerHTML = `<p>Name: ${data.name}</p><p>Email: ${data.email}</p>`;
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Clear tokens from localStorage and redirect to login
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
-            window.location.href = 'login.html';
+            window.location.href = 'login';
         });
     }
 });

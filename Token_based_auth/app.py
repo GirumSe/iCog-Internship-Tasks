@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 import bcrypt
 import jwt
@@ -8,7 +8,6 @@ import re
 from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from werkzeug.security import escape
 import secrets
 
 load_dotenv()  # Load environment variables from .env file
@@ -17,7 +16,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['CSRF_SECRET_KEY'] = os.getenv('CSRF_SECRET_KEY', secrets.token_hex(16))  # CSRF secret key
+app.config['CSRF_SECRET_KEY'] = os.getenv('CSRF_SECRET_KEY')  # CSRF secret key
 
 db = SQLAlchemy(app)
 
@@ -30,6 +29,23 @@ limiter = Limiter(
 
 # Define a pepper value
 PEPPER = os.getenv('PEPPER', 'default_pepper_value')
+
+
+@app.route('/')
+def home():
+    return redirect(url_for('login_page'))
+
+@app.route('/login')
+def login_page():
+    return render_template('login.html')
+
+@app.route('/register')
+def register_page():
+    return render_template('register.html')
+
+@app.route('/profile')
+def profile_page():
+    return render_template('profile.html')
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -65,7 +81,23 @@ def validate_email_address(email):
 
 def sanitize_input(input_value):
     """Sanitize user input to prevent injection attacks."""
-    return escape(input_value)
+    dangerous_chars = {
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        "/": '&#x2F;',
+        "\\": '&#x5C;',
+        "`": '&#x60;',
+        "=": '&#x3D;',
+        "{": '&#x7B;',
+        "}": '&#x7D;'
+    }
+    
+    sanitized_value = ''.join(dangerous_chars.get(c, c) for c in input_value)
+    
+    return sanitized_value
 
 def hash_password(password):
     """Hash the password with bcrypt and a pepper."""
@@ -83,6 +115,8 @@ def generate_csrf_token():
 
 def validate_csrf_token(token):
     """Validate the CSRF token."""
+    print(f"Session CSRF Token: {session.get('csrf_token')}")
+    print(f"Received CSRF Token: {token}")
     return token == session.get('csrf_token')
 
 @app.before_request
@@ -195,5 +229,6 @@ def profile():
         return jsonify({'message': 'Invalid token'}), 401
 
 if __name__ == '__main__':
-    db.create_all()  # Creates the SQLite database and tables
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
