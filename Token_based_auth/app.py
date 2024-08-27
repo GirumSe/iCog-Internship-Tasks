@@ -6,6 +6,8 @@ import datetime
 import os
 import re
 from dotenv import load_dotenv
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -16,8 +18,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+# Initialize Flask-Limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"] 
+)
+
 # Define a pepper value
-PEPPER = os.getenv('PEPPER', 'default_pepper_value')  # Use a secure, random value
+PEPPER = os.getenv('PEPPER', 'default_pepper_value')
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -55,6 +64,7 @@ def check_password(stored_password, provided_password):
     return bcrypt.checkpw((provided_password + PEPPER).encode('utf-8'), stored_password.encode('utf-8'))
 
 @app.route('/register', methods=['POST'])
+@limiter.limit("5 per minute")  # Apply rate limit to this route
 def register():
     data = request.get_json()
     if User.query.filter_by(email=data['email']).first():
@@ -72,6 +82,7 @@ def register():
     return jsonify({'message': 'User registered successfully'}), 201
 
 @app.route('/login', methods=['POST'])
+@limiter.limit("10 per minute")  # Apply rate limit to this route
 def login():
     data = request.get_json()
     user = User.query.filter_by(email=data['email']).first()
@@ -84,6 +95,7 @@ def login():
     return jsonify({'access_token': access_token, 'refresh_token': refresh_token}), 200
 
 @app.route('/verify', methods=['POST'])
+@limiter.limit("5 per minute")  # Apply rate limit to this route
 def verify_token():
     token = request.headers.get('Authorization').split()[1]
     try:
@@ -95,6 +107,7 @@ def verify_token():
         return jsonify({'message': 'Invalid token'}), 401
 
 @app.route('/refresh', methods=['POST'])
+@limiter.limit("5 per minute")  # Apply rate limit to this route
 def refresh_token():
     token = request.headers.get('Authorization').split()[1]
     try:
@@ -107,6 +120,7 @@ def refresh_token():
         return jsonify({'message': 'Invalid token'}), 401
 
 @app.route('/profile', methods=['GET'])
+@limiter.limit("5 per minute")  # Apply rate limit to this route
 def profile():
     token = request.headers.get('Authorization').split()[1]
     try:
