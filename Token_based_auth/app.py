@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
+import bcrypt
 import jwt
 import datetime
 import os
@@ -16,11 +16,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+# Define a pepper value
+PEPPER = os.getenv('PEPPER', 'default_pepper_value')  # Use a secure, random value
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     email = db.Column(db.String(50), unique=True)
-    password = db.Column(db.String(100))
+    password = db.Column(db.String(100))  # bcrypt hashes are 60 bytes long, so this is sufficient
 
 def create_token(identity, expires_in=600):
     expiration = datetime.datetime.utcnow() + datetime.timedelta(seconds=expires_in)
@@ -37,7 +40,19 @@ def validate_password(password):
         return False, "Password must contain at least one lowercase letter"
     if not re.search(r"\d", password):
         return False, "Password must contain at least one digit"
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+        return False, "Password must contain at least one special character"
     return True, "Password is strong"
+
+def hash_password(password):
+    """Hash the password with bcrypt and a pepper."""
+    salt = bcrypt.gensalt(rounds=12)  # Work factor of 12 is generally considered secure
+    hashed = bcrypt.hashpw((password + PEPPER).encode('utf-8'), salt)
+    return hashed.decode('utf-8')
+
+def check_password(stored_password, provided_password):
+    """Check the provided password against the stored hashed password."""
+    return bcrypt.checkpw((provided_password + PEPPER).encode('utf-8'), stored_password.encode('utf-8'))
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -50,7 +65,7 @@ def register():
     if not is_valid:
         return jsonify({'message': message}), 400
 
-    hashed_password = generate_password_hash(password, method='sha256')
+    hashed_password = hash_password(password)
     new_user = User(name=data['name'], email=data['email'], password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
@@ -61,7 +76,7 @@ def login():
     data = request.get_json()
     user = User.query.filter_by(email=data['email']).first()
     
-    if not user or not check_password_hash(user.password, data['password']):
+    if not user or not check_password(user.password, data['password']):
         return jsonify({'message': 'Invalid credentials'}), 401
     
     access_token = create_token(identity=user.email)
