@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 import bcrypt
 import jwt
@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.security import escape
+import secrets
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -16,6 +17,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['CSRF_SECRET_KEY'] = os.getenv('CSRF_SECRET_KEY', secrets.token_hex(16))  # CSRF secret key
 
 db = SQLAlchemy(app)
 
@@ -75,11 +77,29 @@ def check_password(stored_password, provided_password):
     """Check the provided password against the stored hashed password."""
     return bcrypt.checkpw((provided_password + PEPPER).encode('utf-8'), stored_password.encode('utf-8'))
 
+def generate_csrf_token():
+    """Generate a CSRF token."""
+    return secrets.token_hex(16)
+
+def validate_csrf_token(token):
+    """Validate the CSRF token."""
+    return token == session.get('csrf_token')
+
+@app.before_request
+def before_request():
+    """Set CSRF token in the session before each request."""
+    if 'csrf_token' not in session:
+        session['csrf_token'] = generate_csrf_token()
+
 @app.route('/register', methods=['POST'])
 @limiter.limit("5 per minute")  # Apply rate limit to this route
 def register():
+    csrf_token = request.headers.get('X-CSRF-Token')
+    if not validate_csrf_token(csrf_token):
+        return jsonify({'message': 'Invalid CSRF token'}), 403
+
     data = request.get_json()
-    
+
     # Validate and sanitize input
     name = sanitize_input(data.get('name', ''))
     email = sanitize_input(data.get('email', ''))
@@ -105,6 +125,10 @@ def register():
 @app.route('/login', methods=['POST'])
 @limiter.limit("10 per minute")  # Apply rate limit to this route
 def login():
+    csrf_token = request.headers.get('X-CSRF-Token')
+    if not validate_csrf_token(csrf_token):
+        return jsonify({'message': 'Invalid CSRF token'}), 403
+
     data = request.get_json()
 
     # Validate and sanitize input
@@ -123,6 +147,10 @@ def login():
 @app.route('/verify', methods=['POST'])
 @limiter.limit("5 per minute")  # Apply rate limit to this route
 def verify_token():
+    csrf_token = request.headers.get('X-CSRF-Token')
+    if not validate_csrf_token(csrf_token):
+        return jsonify({'message': 'Invalid CSRF token'}), 403
+
     token = request.headers.get('Authorization').split()[1]
     try:
         jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
@@ -135,6 +163,10 @@ def verify_token():
 @app.route('/refresh', methods=['POST'])
 @limiter.limit("5 per minute")  # Apply rate limit to this route
 def refresh_token():
+    csrf_token = request.headers.get('X-CSRF-Token')
+    if not validate_csrf_token(csrf_token):
+        return jsonify({'message': 'Invalid CSRF token'}), 403
+
     token = request.headers.get('Authorization').split()[1]
     try:
         data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
@@ -148,6 +180,10 @@ def refresh_token():
 @app.route('/profile', methods=['GET'])
 @limiter.limit("5 per minute")  # Apply rate limit to this route
 def profile():
+    csrf_token = request.headers.get('X-CSRF-Token')
+    if not validate_csrf_token(csrf_token):
+        return jsonify({'message': 'Invalid CSRF token'}), 403
+
     token = request.headers.get('Authorization').split()[1]
     try:
         data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
