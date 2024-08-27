@@ -1,1 +1,4 @@
 .env
+.gitignore
+/flask_token_based
+/instance
