@@ -1,4 +1,4 @@
-from flask import Flask, request, session
+from flask import Flask, request, session, make_response, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
@@ -30,7 +30,7 @@ def create_app():
         if 'csrf_token' not in session:
             session['csrf_token'] = generate_csrf_token()
         if 'csrf_token' not in request.cookies:
-            response = app.make_response("Cookie")
+            response = make_response(redirect(request.url))
             response.set_cookie('csrf_token', session['csrf_token'])
             return response
 
