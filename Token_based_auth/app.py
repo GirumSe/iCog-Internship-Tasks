@@ -62,14 +62,8 @@ def validate_password(password):
     """Enforce strong password policies."""
     if len(password) < 8:
         return False, "Password must be at least 8 characters long"
-    if not re.search(r"[A-Z]", password):
-        return False, "Password must contain at least one uppercase letter"
-    if not re.search(r"[a-z]", password):
-        return False, "Password must contain at least one lowercase letter"
     if not re.search(r"\d", password):
         return False, "Password must contain at least one digit"
-    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
-        return False, "Password must contain at least one special character"
     return True, "Password is strong"
 
 def validate_email_address(email):
@@ -121,9 +115,14 @@ def validate_csrf_token(token):
 
 @app.before_request
 def before_request():
-    """Set CSRF token in the session before each request."""
     if 'csrf_token' not in session:
         session['csrf_token'] = generate_csrf_token()
+    # Set CSRF token as a cookie if not already present
+    if 'csrf_token' not in request.cookies:
+        response = app.make_response("Cookie")
+        response.set_cookie('csrf_token', session['csrf_token'])
+        return response
+
 
 @app.route('/register', methods=['POST'])
 @limiter.limit("5 per minute")  # Apply rate limit to this route
