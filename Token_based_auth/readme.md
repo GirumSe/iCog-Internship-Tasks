@@ -135,7 +135,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-Feel free to reach out if you have any questions or need further assistance!
-```
-
-This `README.md` provides a clear overview of the project's structure, setup instructions, available endpoints, and utility functions. Adjust the `repository_url` placeholder and other details as needed.
