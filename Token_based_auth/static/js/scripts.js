@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const csrfToken = getCookie('csrf_token');
-
+    console.log(csrfToken)
     // Function to handle token refresh
     function refreshAccessToken() {
         const refreshToken = localStorage.getItem('refresh_token');
