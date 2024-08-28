@@ -1,5 +1,41 @@
 document.addEventListener("DOMContentLoaded", function () {
     const csrfToken = getCookie('csrf_token');
+
+    // Function to handle token refresh
+    function refreshAccessToken() {
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (!refreshToken) {
+            window.location.href = 'login';
+            return;
+        }
+
+        fetch('/refresh', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${refreshToken}`,
+                'X-CSRF-Token': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.access_token) {
+                // Store the new access token in localStorage
+                localStorage.setItem('access_token', data.access_token);
+                // Retry the original request
+                if (originalRequest) {
+                    originalRequest();
+                }
+            } else {
+                // Handle the case where the refresh token is invalid or expired
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                window.location.href = 'login';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
     // Login form submission
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
@@ -67,10 +103,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // Load profile information
     const profileInfo = document.getElementById('profileInfo');
     if (profileInfo) {
-        const accessToken = localStorage.getItem('access_token');
-        if (!accessToken) {
-            window.location.href = 'login';
-        } else {
+        function loadProfile() {
+            const accessToken = localStorage.getItem('access_token');
+            if (!accessToken) {
+                window.location.href = 'login';
+                return;
+            }
+
             fetch('/profile', {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -79,10 +118,9 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 if (data.message === 'Token has expired' || data.message === 'Invalid token') {
-                    // Redirect to login if token is invalid
-                    window.location.href = 'login';
+                    // Try to refresh the token
+                    refreshAccessToken();
                 } else {
                     // Display user info
                     profileInfo.innerHTML = `<p>Name: ${data.name}</p><p>Email: ${data.email}</p>`;
@@ -90,6 +128,8 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => console.error('Error:', error));
         }
+
+        loadProfile();
     }
 
     // Logout
