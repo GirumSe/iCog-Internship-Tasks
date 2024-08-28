@@ -43,9 +43,6 @@ def login_page():
 def register_page():
     return render_template('register.html')
 
-@app.route('/profile')
-def profile_page():
-    return render_template('profile.html')
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -211,23 +208,29 @@ def refresh_token():
         return jsonify({'message': 'Invalid token'}), 401
 
 @app.route('/profile', methods=['GET'])
-@limiter.limit("5 per minute")  # Apply rate limit to this route
+@limiter.limit("20 per minute")  # Apply rate limit to this route
 def profile():
-    csrf_token = request.headers.get('X-CSRF-Token')
-    if not validate_csrf_token(csrf_token):
-        return jsonify({'message': 'Invalid CSRF token'}), 403
+    if request.headers.get('Authorization'):
+        # Handle JSON request for profile data
+        csrf_token = request.headers.get('X-CSRF-Token')
+        if not validate_csrf_token(csrf_token):
+            return jsonify({'message': 'Invalid CSRF token'}), 403
 
-    token = request.headers.get('Authorization').split()[1]
-    try:
-        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-        user = User.query.filter_by(email=data['identity']).first()
-        return jsonify({'name': user.name, 'email': user.email}), 200
-    except jwt.ExpiredSignatureError:
-        return jsonify({'message': 'Token has expired'}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({'message': 'Invalid token'}), 401
+        token = request.headers.get('Authorization').split()[1]
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            user = User.query.filter_by(email=data['identity']).first()
+            return jsonify({'name': user.name, 'email': user.email}), 200
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': 'Token has expired'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'message': 'Invalid token'}), 401
+    else:
+        # Handle HTML page load
+        return render_template('profile.html')
+
 
 if __name__ == '__main__':
-    with app.app_context():
+    with app.app_context(): 
         db.create_all()
     app.run(debug=True)

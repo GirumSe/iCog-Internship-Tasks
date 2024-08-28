@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
     const csrfToken = getCookie('csrf_token');
-    console.log("CSRF Token:", csrfToken);
     // Login form submission
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
@@ -70,7 +69,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (profileInfo) {
         const accessToken = localStorage.getItem('access_token');
         if (!accessToken) {
-            // Redirect to login page if no token
             window.location.href = 'login';
         } else {
             fetch('/profile', {
@@ -81,6 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 if (data.message === 'Token has expired' || data.message === 'Invalid token') {
                     // Redirect to login if token is invalid
                     window.location.href = 'login';
