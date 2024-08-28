@@ -1,6 +1,3 @@
-Here's a comprehensive `README.md` for your Flask project:
-
-```markdown
 # Flask JWT Authentication App
 
 This is a simple Flask application that demonstrates JWT authentication with CSRF protection. The project includes basic features for user registration, login, profile access, and token verification/refresh.
