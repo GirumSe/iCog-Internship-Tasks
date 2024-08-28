@@ -1,6 +1,6 @@
 # Flask JWT Authentication App
 
-This is a simple Flask application that demonstrates JWT authentication with CSRF protection. The project includes basic features for user registration, login, profile access, and token verification/refresh.
+This is a simple Flask application that demonstrates JWT authentication with CSRF protection. The project includes basic features for user registration, login, profile access, and token verification/refresh. The application is designed with security features including token-based authentication and CSRF protection implemented from scratch.
 
 ## Project Structure
 
@@ -30,8 +30,11 @@ flask_project/
 1. **Clone the Repository**
 
    ```bash
-   git clone <repository_url>
-   cd flask_project
+   git clone https://github.com/GirumSe/iCog-Internship-Tasks.git
+   mv Token_based_auth ..
+   cd ..
+   rm -rf iCog-Internship-Tasks
+   cd Token_based_auth
    ```
 
 2. **Create a Virtual Environment**
