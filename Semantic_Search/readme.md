@@ -1,0 +1,3 @@
+# **semantic search**
+
+Semantic search is a sophisticated data searching technique that leverages natural language processing (NLP) and machine learning (ML) to enhance the accuracy and relevance of search results. Unlike traditional keyword-based search methods, which focus solely on exact term matches, semantic search aims to understand the user's intent and the contextual meaning of their queries.
