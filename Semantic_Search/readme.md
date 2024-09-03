@@ -19,7 +19,7 @@ When using word embeddings in semantic search, the first step involves convertin
 
 Once you have vector embeddings for both queries and responses, you need to measure the similarity between these vectors to find the most relevant responses. Here are the main methods used for this purpose:
 
-### 1. **Cosine Similarity**
+### 1. **[Cosine Similarity](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://builtin.com/machine-learning/cosine-similarity&ved=2ahUKEwjnzpnnyKeIAxV1RqQEHU58ET4QFnoECCQQAQ&usg=AOvVaw1wRJrln676QBGazGXS1YOB)**
 
 **Description**: Measures the cosine of the angle between two vectors. It is often used to determine how similar two vectors are in terms of their direction, regardless of their magnitude.
 
@@ -34,7 +34,7 @@ Once you have vector embeddings for both queries and responses, you need to meas
 - **Does Not Capture Magnitude**: Might miss nuances if magnitude differences carry significant meaning.
 - **Not Suitable for Sparse Data**: Less effective with highly sparse vectors.
 
-### 2. **Euclidean Distance**
+### 2. **[Euclidean Distance](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://builtin.com/articles/euclidean-distance&ved=2ahUKEwiMnt2tyaeIAxXKVKQEHQZwLlkQFnoECBYQAQ&usg=AOvVaw2YFlNcY-9KOy0n3UFwTaJO)**
 
 **Description**: Measures the straight-line distance between two points (vectors) in space. It considers both the magnitude and direction of the vectors.
 
@@ -48,7 +48,7 @@ Once you have vector embeddings for both queries and responses, you need to meas
 - **Magnitude Sensitivity**: Can be affected by the scale of the vectors, which might lead to misleading results if vectors are not normalized.
 - **Not Ideal for High Dimensions**: Can become less informative in very high-dimensional spaces due to the "curse of dimensionality."
 
-### 3. **Dot Product**
+### 3. **[Dot Product](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://tivadardanka.com/blog/how-the-dot-product-measures-similarity&ved=2ahUKEwjKxuzQyaeIAxUnVaQEHV5FEeIQFnoECB8QAQ&usg=AOvVaw3_58ODpIvctoZ_CutWNvTQ)**
 
 **Description**: Computes the sum of the products of corresponding entries of two vectors. It indicates how much two vectors align.
 
@@ -62,7 +62,7 @@ Once you have vector embeddings for both queries and responses, you need to meas
 - **Magnitude Influence**: Results are affected by the magnitude of vectors, which might not always be desirable.
 - **Requires Normalization**: Often needs normalization to avoid skewed results.
 
-### 4. **Manhattan Distance**
+### 4. **[Manhattan Distance](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.educative.io/answers/what-is-manhattan-distance-in-machine-learning&ved=2ahUKEwj91YT9yaeIAxVeUqQEHVmJKYcQFnoECBgQAw&usg=AOvVaw2NlnybaphDdvsbGOMMgi-g)**
 
 **Description**: Measures the sum of absolute differences between corresponding components of two vectors.
 
@@ -76,7 +76,7 @@ Once you have vector embeddings for both queries and responses, you need to meas
 - **Less Sensitive to Variance**: May not capture the similarity as effectively as Euclidean distance in some contexts.
 - **Not Ideal for All Vector Spaces**: Less common for text embeddings compared to other methods.
 
-### 5. **Jaccard Similarity**
+### 5. **[Jaccard Similarity](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.learndatasci.com/glossary/jaccard-similarity/&ved=2ahUKEwjkmcqOyqeIAxUYRaQEHQw1DFAQFnoECCcQAQ&usg=AOvVaw2MajI-MHSIzBVdUjP7EtlL)**
 
 **Description**: Measures similarity between finite sample sets by comparing the size of the intersection and union of the sets.
 
@@ -90,7 +90,7 @@ Once you have vector embeddings for both queries and responses, you need to meas
 - **Not Suitable for Dense Vectors**: Less useful for continuous or dense vector embeddings.
 - **Limited Application**: Primarily used for sets and categorical data.
 
-### 6. **Minkowski Distance**
+### 6. **[Minkowski Distance](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.sciencedirect.com/topics/computer-science/minkowski-distance&ved=2ahUKEwjLl-meyqeIAxWFRKQEHcsLBkMQFnoECA8QAQ&usg=AOvVaw13YyW-_l57tVvuTJb4mP-P)**
 
 **Description**: Generalization of Euclidean and Manhattan distances, parameterized by a value \(p\). It includes both L1 (Manhattan) and L2 (Euclidean) as special cases.
 
@@ -104,7 +104,7 @@ Once you have vector embeddings for both queries and responses, you need to meas
 - **Computational Complexity**: Can be more complex to compute, especially for large \(p\).
 - **Requires Careful Tuning**: The choice of \(p\) affects results and requires careful tuning.
 
-### 7. **Pearson Correlation Coefficient**
+### 7. **[Pearson Correlation Coefficient](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.statisticssolutions.com/free-resources/directory-of-statistical-analyses/pearsons-correlation-coefficient/&ved=2ahUKEwjOgqvGyqeIAxVVUaQEHYX2C1sQFnoECCEQAQ&usg=AOvVaw2KyLVjker5aBkWCNdnVEQn)**
 
 **Description**: Measures the linear correlation between two vectors, indicating how well they are linearly related.
 
@@ -120,15 +120,13 @@ Once you have vector embeddings for both queries and responses, you need to meas
 
 Each method has its own strengths and weaknesses, and the choice of which to use can depend on the specific requirements and characteristics of your semantic search application.
 
-Certainly! Here’s a revised version of the post-similarity processing section:
-
 ## **Post-Similarity Processing**
 
 After calculating similarity scores between the query and responses, the next steps involve refining and presenting the results in a way that maximizes their relevance and usefulness. This typically includes ranking, thresholding, and sometimes incorporating user feedback to continuously improve the system.
 
-**Ranking** is a fundamental step where the responses are sorted based on their similarity scores. By arranging the results from most similar to least similar, users are presented with the most relevant information first. This organization helps in quickly identifying and accessing the most pertinent responses, enhancing the overall search experience.
+**[Ranking](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://medium.com/%40kaushicbaravind/build-your-vector-database-enhancing-search-capabilities-with-retrieve-re-rank-627a4d7a00c1&ved=2ahUKEwiy25LCy6eIAxWCT6QEHbHTLvYQFnoECBUQAQ&usg=AOvVaw2gPm1SLQP6Fjnvsa0l0-Ew)** is a fundamental step where the responses are sorted based on their similarity scores. By arranging the results from most similar to least similar, users are presented with the most relevant information first. This organization helps in quickly identifying and accessing the most pertinent responses, enhancing the overall search experience.
 
-**Thresholding** is used to filter out responses that do not meet a minimum similarity score. This process ensures that only those responses that are sufficiently similar to the query are considered, helping to reduce the noise and improve the quality of results presented to users. The choice of threshold level is crucial, as it determines the balance between including potentially relevant responses and excluding irrelevant ones.
+**[Thresholding](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://meta.discourse.org/t/setting-a-similarity-threshold-for-semantic-search/319894&ved=2ahUKEwjpvMmVzKeIAxWsSaQEHcazGjgQFnoECBkQAQ&usg=AOvVaw2nbhEgI2j2YD6eZ5SZgWrg)** is used to filter out responses that do not meet a minimum similarity score. This process ensures that only those responses that are sufficiently similar to the query are considered, helping to reduce the noise and improve the quality of results presented to users. The choice of threshold level is crucial, as it determines the balance between including potentially relevant responses and excluding irrelevant ones.
 
 then we can output the response corresponding to this most similar vector.
 
@@ -146,25 +144,25 @@ While semantic search, by finding the nearest neighbors to vector embeddings, is
 
 To mitigate these challenges, several techniques are employed:
 
-#### **1. Approximate Nearest Neighbor (ANN) Search Algorithms**
+#### **1. Approximate Nearest Neighbor ([ANN](https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.activeloop.ai/resources/glossary/approximate-nearest-neighbors-ann/&ved=2ahUKEwjYsaGyzKeIAxU3UaQEHW-NKO4QFnoECCEQAw&usg=AOvVaw07aqDUCib3WEgRs-hmyrLw)) Search Algorithms**
 
 ANN search algorithms are designed to find approximate rather than exact nearest neighbors, which significantly reduces computational complexity and speeds up the search process. Some popular ANN techniques include:
 
-- **Locality-Sensitive Hashing (LSH)**: This method hashes high-dimensional vectors into buckets such that similar vectors are likely to be hashed into the same bucket. By only comparing vectors within the same bucket, LSH reduces the number of comparisons required.
+- **Locality-Sensitive Hashing ([LSH](https://www.pinecone.io/learn/series/faiss/locality-sensitive-hashing/))**: This method hashes high-dimensional vectors into buckets such that similar vectors are likely to be hashed into the same bucket. By only comparing vectors within the same bucket, LSH reduces the number of comparisons required.
   
-- **Hierarchical Navigable Small World (HNSW)**: This algorithm constructs a graph-based structure where nodes are connected based on their similarity. It navigates through this graph to find approximate nearest neighbors efficiently.
+- **Hierarchical Navigable Small World ([HNSW](https://www.pinecone.io/learn/series/faiss/hnsw/))**: This algorithm constructs a graph-based structure where nodes are connected based on their similarity. It navigates through this graph to find approximate nearest neighbors efficiently.
 
-- **Annoy (Approximate Nearest Neighbors Oh Yeah)**: Developed by Spotify, Annoy builds a forest of random projection trees to quickly find approximate nearest neighbors.
+- **Approximate Nearest Neighbors Oh Yeah ([Annoy](https://sds-aau.github.io/M3Port19/portfolio/ann/))**: Developed by Spotify, Annoy builds a forest of random projection trees to quickly find approximate nearest neighbors.
 
 #### **2. Dimensionality Reduction**
 
 Dimensionality reduction techniques are used to reduce the number of dimensions in the vector space while preserving the essential semantic information. This reduction helps in speeding up similarity calculations. Common techniques include:
 
-- **Principal Component Analysis (PCA)**: PCA reduces the dimensionality of the vector space by projecting vectors onto a lower-dimensional subspace that captures the most variance.
+- **Principal Component Analysis ([PCA](https://builtin.com/data-science/step-step-explanation-principal-component-analysis))**: PCA reduces the dimensionality of the vector space by projecting vectors onto a lower-dimensional subspace that captures the most variance.
 
-- **t-Distributed Stochastic Neighbor Embedding (t-SNE)**: t-SNE is often used for visualizing high-dimensional data by mapping it to a lower-dimensional space, which can also facilitate faster similarity calculations.
+- **t-Distributed Stochastic Neighbor Embedding ([t-SNE](https://medium.com/@sachinsoni600517/mastering-t-sne-t-distributed-stochastic-neighbor-embedding-0e365ee898ea))**: t-SNE is often used for visualizing high-dimensional data by mapping it to a lower-dimensional space, which can also facilitate faster similarity calculations.
 
-- **Uniform Manifold Approximation and Projection (UMAP)**: UMAP is a more recent technique that balances preserving local and global structure in the data while reducing dimensionality.
+- **Uniform Manifold Approximation and Projection ([UMAP](https://www.geeksforgeeks.org/umap-uniform-manifold-approximation-and-projection/))**: UMAP is a more recent technique that balances preserving local and global structure in the data while reducing dimensionality.
 
 #### **3. Indexing Structures**
 
@@ -183,9 +181,7 @@ In practice, a combination of these techniques is often used to achieve an optim
 By employing these techniques, semantic search systems can handle large-scale datasets more efficiently, providing faster and more scalable search solutions while maintaining the relevance and accuracy of search results. 
 
 ---
-
-### Fixing Potential Problems and Improving Search
-
+- even if semantic search is a novel searching method it isn't always as simple as it looks when it comes to real world application. here are some real world challeges that can occur and novel methods to solve them.
 1. **Handling Ambiguity**:
    - **Solution**: Incorporate context using techniques like **contextual word embeddings** (e.g., BERT, GPT) or **semantic parsing** to understand the context better and improve the relevance of search results.
    - **Improvement**: Use **re-ranking algorithms** that consider the context or user intent more deeply, possibly with a feedback loop.
@@ -205,5 +201,3 @@ By employing these techniques, semantic search systems can handle large-scale da
 5. **Scaling with Large Datasets**:
    - **Solution**: Utilize distributed computing frameworks like **Spark** or **Dask** for scaling search operations across large datasets.
    - **Improvement**: Adopt **incremental indexing** and **asynchronous search** methods to handle continuously growing datasets without re-indexing everything from scratch.
-
-By implementing these strategies, semantic similarity search can be made more efficient, accurate, and adaptable to various use cases.
