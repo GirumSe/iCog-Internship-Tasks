@@ -23,16 +23,15 @@
         (max-value $xs)))
 
  ;; min-value
-(: min-value (-> List Int))
 (= (min-value Nil) Error) ;; Handle empty list case as needed
-(= (min-value (:: $x Nil)) $x)
-(= (min-value (:: $x $xs))
+(= (min-value (Cons $x Nil)) $x)
+(= (min-value (Cons $x $xs))
     (if (< $x (min-value $xs))
         $x
         (min-value $xs)))
 
  ;; push
-(: push (-> Element List List))
+(: push (-> $element $list $list))
 (= (push $element $list) (:: $element $list))
 
  ;; pop
@@ -109,3 +108,11 @@
  ;; max-value
 ! (max-value (Cons 1 (Cons 3 (Cons 5 (Cons 2 (Cons -4 Nil)))))) ; Result: 5
 ! (max-value (Cons -1 (Cons 0 (Cons 1 (Cons 2 (Cons 3 Nil)))))) ; Result: 3
+
+ ;; min-value
+! (min-value (Cons 1 (Cons 3 (Cons 5 (Cons 2 (Cons 4 Nil)))))) ; Result: 1
+! (min-value (Cons -1 (Cons 0 (Cons 1 (Cons 2 (Cons 3 Nil)))))) ; Result: -1
+
+ ;; push
+! (push A Nil) ; Result: (:: A Nil)
+! (push 1 (:: 2 (:: 3 Nil))) ; Result: (:: 1 (:: 2 (:: 3 Nil)))
