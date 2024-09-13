@@ -1,7 +1,7 @@
- ;; foldr: Applies a function from right to left, accumulating a result.
+ ;; foldr: Accumulates a result from right to left using the given function and initial value.
 (: foldr (-> (Atom -> Atom -> Atom) Atom List Atom))
-(= (foldr $f $ac Nil) $ac)
-(= (foldr $f $ac (:: $n $d)) ($f $n (foldr $f $ac $d)))
+(= (foldr $f $ac Nil) $ac) ;; Base case: Return the accumulator when the list is empty.
+(= (foldr $f $ac (:: $n $d)) ($f $n (foldr $f $ac $d))) ;; Recursive case: Apply the function to the head and the result of folding the tail.
 
  ;; Test foldr with sum
 (= (sum $x $y) (+ $x $y))

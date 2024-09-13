@@ -1,7 +1,7 @@
- ;; append: Combines two lists by adding all elements of the second list to the end of the first list.
+ ;; append: Concatenates two lists by adding elements from the first list to the front of the second.
 (: append (-> List List List))
-(= (append Nil $ys) $ys)
-(= (append (:: $x $xs) $ys) (:: $x (append $xs $ys)))
+(= (append Nil $ys) $ys) ;; Base case: If the first list is empty, return the second list.
+(= (append (:: $x $xs) $ys) (:: $x (append $xs $ys))) ;; Recursive case: Prepend the first element to the result of appending the rest.
 
  ;; Test append
 ! (append (:: A (:: B (:: C Nil))) (:: D (:: E (:: F (:: G Nil))))) ; Result: (:: A (:: B (:: C (:: D (:: E (:: F (:: G Nil)))))))

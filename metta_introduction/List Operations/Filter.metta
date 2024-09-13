@@ -1,7 +1,10 @@
- ;; filter: Returns a new list containing only the elements that satisfy a predicate function.
+ ;; filter: Keeps only the elements of the list that satisfy the given predicate function.
 (: filter (-> (Atom -> Bool) List List))
-(= (filter $f Nil) Nil)
-(= (filter $f (:: $x $xs)) (if ($f $x) (:: $x (filter $f $xs)) (filter $f $xs)))
+(= (filter $f Nil) Nil) ;; Base case: Empty list.
+(= (filter $f (:: $x $xs))
+    (if ($f $x)
+        (:: $x (filter $f $xs)) ;; Keep the element if it satisfies the predicate.
+        (filter $f $xs))) ;; Otherwise, skip it.
 
  ;; Test filter
 (= (greater-than-3 $x) (> $x 3))

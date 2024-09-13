@@ -1,6 +1,6 @@
- ;; push: Adds an element to the front of the list.
+ ;; push: Adds an element to the front of the list (equivalent to prepend).
 (: push (-> Atom List List))
-(= (push $element $list) (:: $element $list))
+(= (push $element $list) (:: $element $list)) ;; Simply add the element to the front of the list.
 
  ;; Test push
 ! (push A Nil) ; Result: (:: A Nil)
