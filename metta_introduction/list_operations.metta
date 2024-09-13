@@ -39,12 +39,13 @@
 (= (pop (:: $x $xs)) $xs)
 (= (pop Nil) Nil)
 
- ;; remove-element
-(: remove-element (-> Number List List))
-(= (remove-element $x Nil) Nil)
-(= (remove-element $x (Cons $x $xs)) (remove-element $x $xs))
-(= (remove-element $x (Cons $y $xs))
-    (Cons $y (remove-element $x $xs)))
+ ;; Remove all occurrences of a specified element from a list
+(: remove-element (-> List Atom List))
+(= (remove-element Nil $target) Nil)
+(= (remove-element (:: $x $xs) $target)
+    (if (== $x $target)
+        (remove-element $xs $target)
+        (:: $x (remove-element $xs $target))))
 
  ;; remove-duplicate
 (: remove-duplicate (-> List List))
@@ -73,23 +74,25 @@
 (= (reverse (:: $x $xs)) (append (reverse $xs) (:: $x Nil)))
 
  ;; foldl
-(: foldl (-> (Element -> Element -> Element) Element List Element))
-(= (foldl $f $acc Nil) $acc)
-(= (foldl $f $acc (:: $n $s)) (foldl $f ($f $acc $n) $s))
+(= (foldl $f $ac Nil) $ac)
+(= (foldl $f $ac (:: $n $d)) (foldl $f ($f $ac $n) $d))
 
  ;; foldr
-(: foldr (-> (Element -> Element -> Element) Element List Element))
-(= (foldr $f $acc Nil) $acc)
-(= (foldr $f $acc (:: $n $s)) ($f $n (foldr $f $acc $s)))
+(= (foldr $f $ac Nil) $ac)
+(= (foldr $f $ac (:: $n $d)) ($f $n (foldr $f $ac $d)))
 
- ;; bubbleSort
-(: bubbleSort (-> List List))
-(= (bubbleSort Nil) Nil)
-(= (bubbleSort (:: $x Nil)) (:: $x Nil))
-(= (bubbleSort (:: $x (:: $y $xs)))
-    (if (> $x $y)
-        (:: $y (bubbleSort (:: $x $xs)))
-        (:: $x (bubbleSort (:: $y $xs)))))
+ ;; insertion sort helper function
+(: insert-sorted (-> Atom List List))
+(= (insert-sorted $x Nil) (:: $x Nil))
+(= (insert-sorted $x (:: $y $ys))
+    (if (< $x $y)
+        (:: $x (:: $y $ys))
+        (:: $y (insert-sorted $x $ys))))
+
+ ;; insertion sort
+(: insertion-sort (-> List List))
+(= (insertion-sort Nil) Nil)
+(= (insertion-sort (:: $x $xs)) (insert-sorted $x (insertion-sort $xs)))
 
  ;; Test Cases
 
@@ -121,8 +124,8 @@
 ! (pop (:: 1 (:: 2 (:: 3 Nil)))) ; Result: (:: 2 (:: 3 Nil))
 
  ;; remove-element
-! (remove-element 2 (Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 4 Nil)))))) ; Result: (:: 1 (:: 3 (:: 4 Nil)))
-! (remove-element A (Cons A (Cons B (Cons C Nil)))) ; Result: (:: B (:: C Nil))
+! (remove-element (:: 1 (:: 2 (:: 3 (:: 2 (:: 4 Nil))))) 2) ; Result: (:: 1 (:: 3 (:: 4 Nil)))
+! (remove-element (:: A (:: B (:: A (:: C Nil)))) A) ; Result: (:: B (:: C Nil))
 
  ;; remove-duplicate
 ! (remove-duplicate (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 1 Nil)))))) ; Result: (Cons 2 (Cons 3 (Cons 1 Nil)))
@@ -135,3 +138,19 @@
  ;; filter
 (= (greater-than-3 $x) (> $x 3))
 ! (filter greater-than-3 (:: 1 (:: 2 (:: 3 (:: 4 (:: 5 Nil)))))) ; Result: (:: 4 (:: 5 Nil))
+
+ ;; reverse
+! (reverse (:: 1 (:: 2 (:: 3 (:: 4 (:: 5 Nil)))))) ; Result: (:: 5 (:: 4 (:: 3 (:: 2 (:: 1 Nil)))))
+! (reverse (:: A (:: B (:: C Nil)))) ; Result: (:: C (:: B (:: A Nil)))
+
+ ;; sort
+! (insertion-sort (:: 2 (:: 1 (:: 4 (:: 5 (:: 3 Nil)))))) ; Result: (:: 1 (:: 2 (:: 3 (:: 4 (:: 5 Nil)))))
+
+ ;; Define the sum function
+(= (sum $x $y) (+ $x $y))
+
+ ;; Test foldl with sum
+! (foldl sum 0 (:: 1 (:: 2 (:: 3 (:: 4 (:: 5 Nil)))))) ;; Expected output: 15
+
+ ;; Test foldr with sum
+! (foldr sum 1 (:: 1 (:: 2 (:: 3 (:: 4 (:: 5 Nil))))))
