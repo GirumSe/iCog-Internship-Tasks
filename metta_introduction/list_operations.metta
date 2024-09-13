@@ -40,27 +40,27 @@
 (= (pop Nil) Nil)
 
  ;; remove-element
-(: remove-element (-> Element List List))
+(: remove-element (-> Number List List))
 (= (remove-element $x Nil) Nil)
-(= (remove-element $x (:: $x $xs)) (remove-element $x $xs))
-(= (remove-element $x (:: $y $xs))
-    (:: $y (remove-element $x $xs)))
+(= (remove-element $x (Cons $x $xs)) (remove-element $x $xs))
+(= (remove-element $x (Cons $y $xs))
+    (Cons $y (remove-element $x $xs)))
 
  ;; remove-duplicate
 (: remove-duplicate (-> List List))
 (= (remove-duplicate Nil) Nil)
-(= (remove-duplicate (:: $x $xs))
+(= (remove-duplicate (Cons $x $xs))
     (if (is-member $x $xs)
         (remove-duplicate $xs)
-        (:: $x (remove-duplicate $xs))))
+        (Cons $x (remove-duplicate $xs))))
 
  ;; map
-(: map (-> (Element -> Element) List List))
+(: map (-> (-> Element  Element) List List))
 (= (map $f Nil) Nil)
 (= (map $f (:: $x $xs)) (:: ($f $x) (map $f $xs)))
 
  ;; filter
-(: filter (-> (Element -> Bool) List List))
+(: filter (-> (-> Element  Bool) List List))
 (= (filter $f Nil) Nil)
 (= (filter $f (:: $x $xs))
     (if ($f $x)
@@ -116,3 +116,22 @@
  ;; push
 ! (push A Nil) ; Result: (:: A Nil)
 ! (push 1 (:: 2 (:: 3 Nil))) ; Result: (:: 1 (:: 2 (:: 3 Nil)))
+ ;; pop
+! (pop (:: A (:: B (:: C Nil)))) ; Result: (:: B (:: C Nil))
+! (pop (:: 1 (:: 2 (:: 3 Nil)))) ; Result: (:: 2 (:: 3 Nil))
+
+ ;; remove-element
+! (remove-element 2 (Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 4 Nil)))))) ; Result: (:: 1 (:: 3 (:: 4 Nil)))
+! (remove-element A (Cons A (Cons B (Cons C Nil)))) ; Result: (:: B (:: C Nil))
+
+ ;; remove-duplicate
+! (remove-duplicate (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 1 Nil)))))) ; Result: (Cons 2 (Cons 3 (Cons 1 Nil)))
+! (remove-duplicate (Cons A (Cons A (Cons B (Cons C (Cons C Nil)))))) ; Result: (:: A (:: B (:: C Nil)))
+
+ ;; map
+(= (increment $x) (+ $x 1))
+! (map increment (:: 1 (:: 2 (:: 3 Nil)))) ; Result: (:: 2 (:: 3 (:: 4 Nil)))
+
+ ;; filter
+(= (greater-than-3 $x) (> $x 3))
+! (filter greater-than-3 (:: 1 (:: 2 (:: 3 (:: 4 (:: 5 Nil)))))) ; Result: (:: 4 (:: 5 Nil))
