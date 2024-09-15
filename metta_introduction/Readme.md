@@ -1,15 +1,16 @@
-# MeTTa Data Structures
+# MeTTa Data Structures and Family Tree Task
 
-This repository contains implementations of fundamental data structures and operations in the [MeTTa](https://github.com/trueagi-io/hyperon-experimental) language, specifically focusing on **Binary Trees** and **List Operations**. These implementations can be used as basic building blocks for various algorithms in a functional programming style.
+This repository contains implementations of fundamental data structures and operations in the [MeTTa](https://github.com/trueagi-io/hyperon-experimental) language, specifically focusing on **Binary Trees**, **List Operations**, and a **Family Tree Task**. These implementations can be used as basic building blocks for various algorithms in a functional programming style.
 
 ## Contents
 
 1. [Binary Trees](#binary-trees)
 2. [List Operations](#list-operations)
-3. [Getting Started](#getting-started)
-4. [Usage](#usage)
-5. [Contributing](#contributing)
-6. [License](#license)
+3. [Family Tree Task](#family-tree-task)
+4. [Getting Started](#getting-started)
+5. [Usage](#usage)
+6. [Contributing](#contributing)
+7. [License](#license)
 
 ---
 
@@ -86,6 +87,56 @@ For more details, see the [List Operations/README.md](List Operations/Readme.md)
 
 ---
 
+## Family Tree Task
+
+The `Family Tree/` folder contains an implementation of family tree relationships in MeTTa. This includes several operations to query relationships such as parents, siblings, uncles, nephews, and more.
+
+### Implemented Queries
+
+- **Get Parents**: Retrieve the parents of a given individual.
+- **Get Grandparents**: Retrieve the grandparents of a given individual.
+- **Get Siblings**: Retrieve the siblings of a given individual.
+- **Get Uncles**: Retrieve the uncles of a given individual.
+- **Get Nephews**: Retrieve the nephews of a given individual.
+- **Get Nieces**: Retrieve the nieces of a given individual.
+- **Get Predecessors**: Retrieve all ancestors of a given individual (parents, grandparents, etc.).
+
+### Example Usage
+
+- **Get the parents of John:**
+
+```metta
+(get-parents John)
+```
+
+- **Get the mother of Pam:**
+
+```metta
+(get-mother Pam)
+```
+
+- **Get the siblings of Pam:**
+
+```metta
+(get-siblings Pam)
+```
+
+- **Get the uncles of Eve:**
+
+```metta
+(get-uncles Eve)
+```
+
+- **Get the nephews of John:**
+
+```metta
+(get-nephews John)
+```
+
+For more details, see the [Family Tree/README.md](Family Tree/Readme.md).
+
+---
+
 ## Getting Started
 
 ### Prerequisites
@@ -100,24 +151,25 @@ You must have [MeTTa](https://github.com/trueagi-io/hyperon-experimental) instal
    cd iCog-Internship-Tasks/metta_introduction
    ```
 
-2. Navigate to the folder for either **Binary Tree Implementation** or **List Operations**:
+2. Navigate to the desired folder for **Binary Tree Implementation**, **List Operations**, or **Family Tree**:
    ```bash
    cd Binary\ Tree\ Implementation/
    ```
 
 3. Run the `.metta` files in your terminal:
    ```bash
-   metta  binary_tree.metta
+   metta binary_tree.metta
    ```
 
 ---
 
 ## Usage
 
-Each folder contains a main `.metta` script that showcases how the respective data structure or list operations work. You can modify these scripts to experiment with the functionality or incorporate these structures into larger projects.
+Each folder contains a main `.metta` script that showcases how the respective data structure or family tree queries work. You can modify these scripts to experiment with the functionality or incorporate these structures into larger projects.
 
 - **Binary Tree Script:** `Binary Tree Implementation/binary_tree.metta`
 - **List Operations Script:** `List Operations/operations_name.metta`
+- **Family Tree Script:** `Family Tree/family.metta`
 
 ---
 
@@ -132,3 +184,9 @@ Contributions are welcome! If you have any suggestions or improvements, feel fre
 3. Make your changes.
 4. Commit and push to your branch.
 5. Open a pull request for review.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
