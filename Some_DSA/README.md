@@ -178,20 +178,6 @@ def buildTree(preorder: list[int], inorder: list[int]) -> TreeNode:
     return buildTreeRecursive(0, 0, len(inorder) - 1)
 ```
 
-#### Example:
-**Input**:  
-- `preorder = [3,9,20,15,7]`  
-- `inorder = [9,3,15,20,7]`
-
-**Output**:  
-The reconstructed tree would be:
-```
-    3
-   / \
-  9  20
-     /  \
-   15    7
-```
 ## Post-Order Traversal
 
 ### **Question 2: Delete Leaves with a Given Value (5 pts)**
@@ -199,15 +185,12 @@ The reconstructed tree would be:
 specific value, then repeat this process for any nodes that become new leaves due to the
 removal. Continue until no more leaves with the target value remain. Your task is to
 return the modified tree's root.
-- Hint: Use post-order traversal to process children before the parent, allowing you to
-identify and remove leaf nodes efficiently.
+- Hint: Use post-order traversal to process children before the parent, allowing you to identify and remove leaf nodes efficiently. 
 
 Example 1:
--  Input: root = [1,2,3,2,null,2,4], target = 2
+- Input: root = [1,2,3,2,null,2,4], target = 2
 - Output: [1,null,3,null,4]
-- Explanation: Leaf nodes in green with value (target = 2) are removed (Picture in
-left). After removing, new nodes become leaf nodes with value (target = 2)
-(Picture in center).
+- Explanation: Leaf nodes in green with value (target = 2) are removed (Picture in left).
 
 **Solution**
 
@@ -225,7 +208,7 @@ left). After removing, new nodes become leaf nodes with value (target = 2)
 #### Space Complexity:
 - The space complexity is **O(h)**, where `h` is the height of the tree due to the recursion stack.
 
-#### Code Solution (Python):
+#### Code Solution:
 
 ```python
 class TreeNode:
@@ -249,26 +232,24 @@ def removeLeafNodes(root: TreeNode, target: int) -> TreeNode:
     return root
 ```
 
-#### Example:
-**Input**: 
-```
-root = [1,2,3,2,null,2,4], target = 2
-```
-**Output**: 
-```
-[1,null,3,null,4]
-```
-
-**Explanation**:
-- Initially, the leaf nodes with the value `2` are removed.
-- After removing, the tree structure changes, and new leaf nodes with the value `2` are identified and removed in subsequent passes.
-
----
-
 ### **Question 3: Trimming and Forest Creation in Binary Tree (5 pts)**
 
-#### Problem Breakdown:
-Given a binary tree and a list of values to remove, we are tasked with eliminating all nodes containing these values. After removing the nodes, we need to return a list containing the roots of all trees in the resulting forest. Any children of the removed nodes should be treated as new trees in the forest.
+- Given a binary tree and a list of values to remove, eliminate all nodes containing these
+values. Return a list containing the roots of all trees in the resulting forest.
+- Hint: Conduct a post-order traversal, removing specified nodes and adding their children
+to the result as necessary.
+
+Example 1:
+- Input: root = [1,2,3,4,5,6,7], to_delete = [3,5]
+- Output: [[1,2,null,4],[6],[7]]
+Example 2:
+- Input: root = [1,2,4,null,3], to_delete = [3]
+- Output: [[1,2,4]]
+Constraints:
+- The number of nodes in the given tree is at most 1000.
+- Each node has a distinct value between 1 and 1000.
+- to_delete.length <= 1000
+- to_delete contains distinct values between 1 and 1000.
 
 #### Approach:
 1. We will use **post-order traversal** to process each node’s children before deciding whether to remove the current node.
@@ -284,7 +265,7 @@ Given a binary tree and a list of values to remove, we are tasked with eliminati
 #### Space Complexity:
 - The space complexity is **O(h)**, where `h` is the height of the tree due to recursion stack space.
 
-#### Code Solution (Python):
+#### Code Solution:
 
 ```python
 class TreeNode:
@@ -326,20 +307,270 @@ def delNodes(root: TreeNode, to_delete: list[int]) -> list[TreeNode]:
     
     return forest
 ```
+## In-Order Traversal
+### **Question 3: Locating Specific Element in Sorted Tree Structure (3 pts)**
+- Given the root of a binary search tree and a positive integer k, identify and return the kth
+smallest value among all node values in the tree. Assume k is valid and within the range
+of the tree's size.
+- Hint: Perform an in-order traversal while maintaining a count of visited nodes.
+
+Example 1:
+- Input: root = [3,1,4,null,2], k = 1
+- Output: 1
+
+Example 2:
+- Input: root = [5,3,6,2,4,null,null,1], k = 3
+- Output: 3
+
+Constraints:
+- The number of nodes in the tree is n.
+- 1 <= k <= n <= 104
+- 0 <= Node.val <= 104
+
+#### Approach:
+1. **In-order traversal** of a BST produces nodes in sorted order. We will leverage this property to find the k-th smallest element.
+2. We will perform an in-order traversal while keeping a count of the nodes visited. Once the count equals `k`, we return the current node’s value.
+3. To optimize space, we can do this iteratively or recursively.
+
+#### Time Complexity:
+- The time complexity is **O(n)** in the worst case, where `n` is the number of nodes in the tree, since we may need to visit all nodes to find the k-th smallest element.
+
+#### Space Complexity:
+- The space complexity is **O(h)**, where `h` is the height of the tree due to recursion stack space (or the stack used in an iterative solution).
+
+#### Code Solution:
+
+```python
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def kthSmallest(root: TreeNode, k: int) -> int:
+    # Initialize a counter to track the number of nodes visited
+    count = 0
+    result = None
+
+    def inorder(node: TreeNode):
+        nonlocal count, result
+        if not node or result is not None:
+            return
+        
+        # Traverse the left subtree
+        inorder(node.left)
+        
+        # Visit the current node
+        count += 1
+        if count == k:
+            result = node.val
+            return
+        
+        # Traverse the right subtree
+        inorder(node.right)
+    
+    # Perform in-order traversal
+    inorder(root)
+    
+    return result
+```
+
+### **Question 4: Given the Root of a Binary Search Tree, Return the k-th Smallest Value (1-indexed) (3 pts)**
+
+Example 1:
+- Input: root = [3,1,4,null,2], k = 1
+- Output: 1
+
+Example 2:
+- Input: root = [5,3,6,2,4,null,null,1], k = 3
+- Output: 3
+
+This question is the same as question 3, where we need to find the **k-th smallest value** in a Binary Search Tree. The approach remains the same, and we've already provided a solution for this.
+
+To recap:
+
+- **Approach**: Use **in-order traversal** to traverse the nodes in ascending order, keeping a count to track when the k-th smallest element is reached.
+  
+- **Time Complexity**: **O(n)** (traversing all nodes).
+  
+- **Space Complexity**: **O(h)** (recursion stack space).
+
+#### Code Solution:
+
+```python
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def kthSmallest(root: TreeNode, k: int) -> int:
+    count = 0
+    result = None
+
+    def inorder(node: TreeNode):
+        nonlocal count, result
+        if not node or result is not None:
+            return
+        
+        inorder(node.left)
+        count += 1
+        if count == k:
+            result = node.val
+            return
+        inorder(node.right)
+    
+    inorder(root)
+    return result
+```
+## Depth First Search
+### **Question 1: Connected Region Counter (5 pts)**
+
+- You are given a m x n 2D grid where '1' represents land and '0' represents water. Count
+and return the number of distinct land masses, where a land mass is a group of adjacent
+land cells (horizontally or vertically). You may assume all four edges of the grid are all
+surrounded by water.
+- Hint: Use DFS to explore each land cell, marking visited cells to avoid double-counting.
+
+Example 1:
+
+
+#### Approach:
+1. Use **Depth First Search (DFS)** to explore each cell in the grid. When encountering a `'1'`, use DFS to explore all the adjacent cells that are also `'1'`, marking them as visited (i.e., changing `'1'` to `'0'` or using a visited set).
+2. Every time DFS is initiated from an unvisited `'1'`, it indicates the start of a new connected land mass, so increment the land mass counter.
+3. Continue the process until all cells are processed.
+
+#### Time Complexity:
+- The time complexity is **O(m * n)**, where `m` is the number of rows and `n` is the number of columns in the grid, as we must visit each cell once.
+
+#### Space Complexity:
+- The space complexity is **O(m * n)** due to the recursion stack in the worst case when the entire grid is land.
+
+#### Code Solution (Python):
+
+```python
+def numIslands(grid: list[list[str]]) -> int:
+    if not grid:
+        return 0
+    
+    rows, cols = len(grid), len(grid[0])
+    island_count = 0
+
+    # Helper function to perform DFS
+    def dfs(r, c):
+        # Base case: if out of bounds or the cell is water
+        if r < 0 or c < 0 or r >= rows or c >= cols or grid[r][c] == '0':
+            return
+        
+        # Mark the cell as visited (change land to water)
+        grid[r][c] = '0'
+        
+        # Explore the four adjacent cells
+        dfs(r - 1, c)  # up
+        dfs(r + 1, c)  # down
+        dfs(r, c - 1)  # left
+        dfs(r, c + 1)  # right
+
+    # Iterate through each cell in the grid
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == '1':  # Start a DFS for every unvisited land cell
+                island_count += 1
+                dfs(r, c)
+
+    return island_count
+```
 
 #### Example:
 **Input**: 
 ```
-root = [1,2,3,4,5,6,7], to_delete = [3,5]
+grid = [
+    ["1","1","1","1","0"],
+    ["1","1","0","1","0"],
+    ["1","1","0","0","0"],
+    ["0","0","0","0","0"]
+]
 ```
 **Output**: 
 ```
-[[1,2,null,4],[6],[7]]
+1
 ```
 
-**Explanation**:
-- Node `3` and `5` are deleted. Their children (`6` and `7` for `3` and `4` for `5`) become new trees in the resulting forest.
+**Explanation**: There is one large connected land mass.
 
 ---
 
-Both answers now include the necessary explanation, time and space complexity analysis, and Python code solutions for the given problems.
+### **Question 2: Prerequisite Fulfillment Checker (5 pts)**
+
+#### Problem Breakdown:
+In an academic system with `numCourses` (labeled from 0 to numCourses-1), you are given a list of prerequisite pairs where `prerequisites[i] = [a_i, b_i]` indicates that you must take course `b_i` before course `a_i`. The task is to determine if it is possible to finish all courses (i.e., no circular dependencies).
+
+#### Approach:
+1. The problem is about detecting a cycle in a **Directed Acyclic Graph (DAG)** where courses are nodes, and prerequisites are directed edges. If a cycle exists, it means that a course depends on itself, either directly or indirectly, making it impossible to complete the courses.
+2. We can use **DFS** to detect cycles. During DFS traversal, mark nodes as:
+   - **Unvisited** (not yet processed),
+   - **Visiting** (currently being processed, i.e., in the DFS stack),
+   - **Visited** (fully processed).
+3. If we encounter a node that is currently **Visiting**, we have detected a cycle.
+4. If the graph is acyclic, we can finish all courses.
+
+#### Time Complexity:
+- The time complexity is **O(numCourses + prerequisites.length)** because we visit each node (course) and edge (prerequisite) once.
+
+#### Space Complexity:
+- The space complexity is **O(numCourses)** due to the recursion stack and additional data structures to store the graph and state of each node.
+
+#### Code Solution (Python):
+
+```python
+def canFinish(numCourses: int, prerequisites: list[list[int]]) -> bool:
+    # Create an adjacency list to represent the graph
+    graph = {i: [] for i in range(numCourses)}
+    for course, prereq in prerequisites:
+        graph[prereq].append(course)
+    
+    # State of each course: 0 = unvisited, 1 = visiting, 2 = visited
+    state = [0] * numCourses
+
+    # DFS function to check for cycles
+    def dfs(course):
+        if state[course] == 1:  # Cycle detected
+            return False
+        if state[course] == 2:  # Already processed
+            return True
+
+        # Mark as visiting
+        state[course] = 1
+        
+        # Visit all the courses that depend on this course
+        for next_course in graph[course]:
+            if not dfs(next_course):
+                return False
+
+        # Mark as visited
+        state[course] = 2
+        return True
+    
+    # Check each course for cycles
+    for course in range(numCourses):
+        if not dfs(course):
+            return False
+    
+    return True
+```
+
+#### Example:
+**Input**: 
+```
+numCourses = 2, prerequisites = [[1, 0]]
+```
+**Output**: 
+```
+True
+```
+
+**Explanation**: You can take course 0 first and then course 1.
+
+---
+
+Both answers now include a detailed explanation, time and space complexity analysis, and Python code solutions for the given problems from the **Depth First Search** section.
