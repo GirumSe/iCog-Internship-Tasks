@@ -433,8 +433,32 @@ surrounded by water.
 - Hint: Use DFS to explore each land cell, marking visited cells to avoid double-counting.
 
 Example 1:
+```
+Input: grid = [
+["1","1","1","1","0"],
+["1","1","0","1","0"],
+["1","1","0","0","0"],
+["0","0","0","0","0"]
+] 
+```
+- Output: 1
 
+Example 2:
+```
+Input: grid = [
+["1","1","0","0","0"],
+["1","1","0","0","0"],
+["0","0","1","0","0"],
+["0","0","0","1","1"]
+]
+```
+- Output: 3
 
+Constraints:
+- m == grid.length
+- n == grid[i].length
+- 1 <= m, n <= 300
+- `grid[i][j]` is '0' or '1'.
 #### Approach:
 1. Use **Depth First Search (DFS)** to explore each cell in the grid. When encountering a `'1'`, use DFS to explore all the adjacent cells that are also `'1'`, marking them as visited (i.e., changing `'1'` to `'0'` or using a visited set).
 2. Every time DFS is initiated from an unvisited `'1'`, it indicates the start of a new connected land mass, so increment the land mass counter.
@@ -446,7 +470,7 @@ Example 1:
 #### Space Complexity:
 - The space complexity is **O(m * n)** due to the recursion stack in the worst case when the entire grid is land.
 
-#### Code Solution (Python):
+#### Code Solution:
 
 ```python
 def numIslands(grid: list[list[str]]) -> int:
@@ -480,31 +504,35 @@ def numIslands(grid: list[list[str]]) -> int:
 
     return island_count
 ```
-
-#### Example:
-**Input**: 
-```
-grid = [
-    ["1","1","1","1","0"],
-    ["1","1","0","1","0"],
-    ["1","1","0","0","0"],
-    ["0","0","0","0","0"]
-]
-```
-**Output**: 
-```
-1
-```
-
-**Explanation**: There is one large connected land mass.
-
----
-
 ### **Question 2: Prerequisite Fulfillment Checker (5 pts)**
 
-#### Problem Breakdown:
-In an academic system with `numCourses` (labeled from 0 to numCourses-1), you are given a list of prerequisite pairs where `prerequisites[i] = [a_i, b_i]` indicates that you must take course `b_i` before course `a_i`. The task is to determine if it is possible to finish all courses (i.e., no circular dependencies).
+- In an academic system with numCourses (labeled from 0 to numCourses-1), you're given a list of prerequisite pairs where prerequisites[i] = [a1, b1] indicates that you must take course b1 first if you want to take course a1.
+- For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
+- Return true if you can finish all courses. Otherwise, return false.
+- Hint: Use DFS to identify any circular dependencies in the course prerequisite structure.
+○
+○
+For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
+Return true if you can finish all courses. Otherwise, return false.
+Hint: Use DFS to identify any circular dependencies in the course prerequisite structure.
 
+Example 1:
+- Input: numCourses = 2, prerequisites = [[1,0]]
+- Output: true
+- Explanation: There are a total of 2 courses to take. To take course 1 you should
+have finished course 0. So it is possible.
+
+Example 2:
+- Input: numCourses = 2, prerequisites = [[1,0],[0,1]]
+- Output: false
+- Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
+
+Constraints:
+- 1 <= numCourses <= 2000
+- 0 <= prerequisites.length <= 5000
+- prerequisites[i].length == 2
+- 0 <= a1, b1 < numCourses
+- All the pairs prerequisites[i] are unique.
 #### Approach:
 1. The problem is about detecting a cycle in a **Directed Acyclic Graph (DAG)** where courses are nodes, and prerequisites are directed edges. If a cycle exists, it means that a course depends on itself, either directly or indirectly, making it impossible to complete the courses.
 2. We can use **DFS** to detect cycles. During DFS traversal, mark nodes as:
@@ -520,7 +548,7 @@ In an academic system with `numCourses` (labeled from 0 to numCourses-1), you ar
 #### Space Complexity:
 - The space complexity is **O(numCourses)** due to the recursion stack and additional data structures to store the graph and state of each node.
 
-#### Code Solution (Python):
+#### Code Solution:
 
 ```python
 def canFinish(numCourses: int, prerequisites: list[list[int]]) -> bool:
@@ -559,18 +587,164 @@ def canFinish(numCourses: int, prerequisites: list[list[int]]) -> bool:
     return True
 ```
 
-#### Example:
-**Input**: 
-```
-numCourses = 2, prerequisites = [[1, 0]]
-```
-**Output**: 
-```
-True
+## Breadth First Search
+### **Question 1: As Far From Land As Possible (4 pts)**
+
+-Imagine a map represented by a n x n grid, where some cells are islands with value 1 and others are ocean with value 0.
+Find a water cell such that its distance to the nearest land cell is maximized, and return the distance. If no land or water exists in the grid, return -1.
+The distance used in this problem is the Manhattan distance: the distance between two cells (x0, y0) and (x1, y1) is |x0 - x1| + |y0 - y1|.
+
+Example 1:
+- Input: grid = [[1,0,1],[0,0,0],[1,0,1]]
+- Output: 2
+- Explanation: The cell (1, 1) is as far as possible from all the land with distance 2.
+
+Example 2:
+- Input: grid = [[1,0,0],[0,0,0],[0,0,0]]
+- Output: 4
+- Explanation: The cell (2, 2) is as far as possible from all the land with distance 4.
+
+Constraints:
+- n == grid.length
+- n == grid[i].length
+- 1 <= n <= 100D
+- `grid[i][j]` is 0 or 1
+
+#### Approach:
+1. **Breadth-First Search (BFS)** is perfect for finding the shortest distance from multiple sources (land cells) to the farthest target (water cell).
+2. We will:
+   - Start the BFS from all the land cells (`1`s) simultaneously, treating all of them as starting points.
+   - Use BFS to explore each level outward, layer by layer, until we reach the farthest water cell (`0`).
+   - The last layer explored in BFS gives the maximum distance.
+3. We need to track visited cells to avoid reprocessing them.
+
+#### Time Complexity:
+- The time complexity is **O(n²)** because we need to process all `n²` cells in the grid.
+
+#### Space Complexity:
+- The space complexity is **O(n²)** because we need to store the queue and visited state for all `n²` cells.
+
+#### Code Solution:
+
+```python
+from collections import deque
+
+def maxDistance(grid: list[list[int]]) -> int:
+    n = len(grid)
+    queue = deque()
+    
+    # Start by adding all land cells (1) to the queue
+    for r in range(n):
+        for c in range(n):
+            if grid[r][c] == 1:
+                queue.append((r, c))
+    
+    # If there are no land or no water cells, return -1
+    if len(queue) == 0 or len(queue) == n * n:
+        return -1
+    
+    # Perform BFS from all land cells
+    distance = -1
+    directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]  # Possible 4-directional moves
+    
+    while queue:
+        distance += 1
+        for _ in range(len(queue)):
+            r, c = queue.popleft()
+            
+            # Explore the 4 possible directions
+            for dr, dc in directions:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < n and 0 <= nc < n and grid[nr][nc] == 0:
+                    grid[nr][nc] = 1  # Mark the water cell as visited by changing it to land
+                    queue.append((nr, nc))
+    
+    return distance
 ```
 
-**Explanation**: You can take course 0 first and then course 1.
+### **Question 2: Contamination Spread Simulator (5 pts)**
 
----
+- You're presented with a m x n grid where each cell can be in one of three states: 0 (empty), 1 (fresh), or 2 (contaminated). Each minute, any fresh cell adjacent (up, down, left, right) to a contaminated cell becomes contaminated. Return the minimum number of minutes required for all fresh cells to become contaminated, or return -1 if it's impossible.
+- Hint: Implement BFS starting from all contaminated cells simultaneously to model the
+spread of contamination.
 
-Both answers now include a detailed explanation, time and space complexity analysis, and Python code solutions for the given problems from the **Depth First Search** section.
+Example 1:
+- Input: grid = [[2,1,1],[1,1,0],[0,1,1]]
+- Output: 4
+
+Example 2:
+- Input: grid = [[2,1,1],[0,1,1],[1,0,1]]
+- Output: -1
+- Explanation: The orange in the bottom left corner (row 2, column 0) is never rotten, because rotting only happens 4-directionally.
+
+Example 3:
+- Input: grid = [[0,2]]
+- Output: 0
+- Explanation: Since there are already no fresh oranges at minute 0, the answer is just 0.
+
+Constraints:
+- m == grid.length
+- n == grid[i].length
+- 1 <= m, n <= 10
+- `grid[i][j]` is 0, 1, or 2.
+#### Approach:
+1. **Breadth-First Search (BFS)** can be used to simulate the contamination process. The BFS starts from all contaminated cells (`2`s) simultaneously, and at each step, spreads to adjacent fresh cells (`1`s).
+2. We will:
+   - Initialize the BFS with all contaminated cells as the starting points.
+   - For each level in BFS (representing one minute), we contaminate all adjacent fresh cells.
+   - Keep track of the total number of fresh cells. If we manage to contaminate all of them, return the total time; otherwise, return `-1`.
+3. If there are no fresh cells at the beginning, return `0`.
+
+#### Time Complexity:
+- The time complexity is **O(m * n)**, where `m` and `n` are the dimensions of the grid, as we need to process all cells.
+
+#### Space Complexity:
+- The space complexity is **O(m * n)** because we need space for the queue and for marking visited cells.
+
+#### Code Solution:
+
+```python
+from collections import deque
+
+def minMinutesToSpread(grid: list[list[int]]) -> int:
+    m, n = len(grid), len(grid[0])
+    queue = deque()
+    fresh_count = 0
+
+    # Initialize the queue with all contaminated cells and count fresh cells
+    for r in range(m):
+        for c in range(n):
+            if grid[r][c] == 2:
+                queue.append((r, c))
+            elif grid[r][c] == 1:
+                fresh_count += 1
+
+    # If there are no fresh cells, return 0
+    if fresh_count == 0:
+        return 0
+    
+    # Directions for 4-directional movement
+    directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    minutes = 0
+    
+    # Perform BFS to spread the contamination
+    while queue:
+        minutes += 1
+        for _ in range(len(queue)):
+            r, c = queue.popleft()
+            
+            # Explore adjacent cells
+            for dr, dc in directions:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < m and 0 <= nc < n and grid[nr][nc] == 1:
+                    grid[nr][nc] = 2  # Contaminate the fresh cell
+                    fresh_count -= 1
+                    queue.append((nr, nc))
+        
+        # If there are no fresh cells left, we are done
+        if fresh_count == 0:
+            return minutes
+    
+    # If there are still fresh cells left, return -1
+    return -1
+```
