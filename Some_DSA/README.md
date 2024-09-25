@@ -510,8 +510,8 @@ def numIslands(grid: list[list[str]]) -> int:
 - For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
 - Return true if you can finish all courses. Otherwise, return false.
 - Hint: Use DFS to identify any circular dependencies in the course prerequisite structure.
-○
-○
+    -
+    -
 For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
 Return true if you can finish all courses. Otherwise, return false.
 Hint: Use DFS to identify any circular dependencies in the course prerequisite structure.
@@ -747,4 +747,157 @@ def minMinutesToSpread(grid: list[list[int]]) -> int:
     
     # If there are still fresh cells left, return -1
     return -1
+```
+## Expert challenge
+
+Let's break down and solve **questions 1 and 2 from the Expert Challenge section**, following the provided instructions.
+
+---
+
+### **Question 1: Car Routes - Least Number of Cars to Travel (8 pts)**
+- You are given an array routes representing car routes where routes[i] is a car route that the ith car repeats forever.
+- For example, if routes[0] = [1, 5, 7], this means that the 0th car travels in the sequence 1
+-> 5 -> 7 -> 1 -> 5 -> 7 -> 1 -> ... forever.
+- You will start at the car stop source (You are not on any car initially), and you want to go to the car stop target. You can travel between car stops by cars only.
+- Return the least number of cars you must take to travel from source to target. Return -1 if it is not possible.
+
+Example 1:
+- Input: routes = [[1,2,7],[3,6,7]], source = 1, target = 6
+- Output: 2
+- Explanation: The best strategy is take the first bus to the bus stop 7, then take the
+second bus to the bus stop 6.
+
+Example 2:
+- Input: routes = [[7,12],[4,5,15],[6],[15,19],[9,12,13]], source = 15, target = 12
+- Output: -1
+
+Constraints:
+- 1 <= routes.length <= 500.
+- 1 <= routes[i].length <= 105
+- All the values of routes[i] are unique.
+- sum(routes[i].length) <= 105
+- 0 <= routes[i][j] < 106
+- 0 <= source, target < 106
+
+#### Approach:
+1. This is a graph traversal problem where each car's route represents a node, and an edge exists between two nodes (routes) if they share a common stop.
+2. We will build a **graph** of routes, where each route (car) is connected to another if they share any stop. Then, we will perform a **Breadth-First Search (BFS)** starting from the routes that include the `source` stop.
+3. The BFS will explore the minimum number of car changes required to reach the `target` stop.
+
+#### Steps:
+1. Create a mapping between each stop and the list of routes (cars) that visit that stop.
+2. Perform BFS starting from the routes that visit the `source`. For each route, check all the other routes connected via shared stops. Track the visited routes to avoid cycles.
+3. If a route visits the `target`, return the number of route switches taken. If BFS completes without reaching the target, return `-1`.
+
+#### Time Complexity:
+- The time complexity is **O(N + E)**, where `N` is the total number of stops across all routes and `E` is the total number of route-to-route connections (edges in the graph).
+
+#### Space Complexity:
+- The space complexity is **O(N + E)** due to the graph representation and the BFS queue.
+
+#### Code Solution:
+
+```python
+from collections import defaultdict, deque
+
+def numBusesToDestination(routes: list[list[int]], source: int, target: int) -> int:
+    if source == target:
+        return 0
+
+    # Map each stop to the list of routes that visit it
+    stop_to_routes = defaultdict(list)
+    for i, route in enumerate(routes):
+        for stop in route:
+            stop_to_routes[stop].append(i)
+    
+    # BFS initialization
+    visited_routes = set()
+    visited_stops = set([source])
+    queue = deque([(source, 0)])  # (current stop, number of buses taken)
+
+    while queue:
+        stop, bus_count = queue.popleft()
+
+        # Check all routes passing through the current stop
+        for route in stop_to_routes[stop]:
+            if route in visited_routes:
+                continue
+
+            # Mark the route as visited
+            visited_routes.add(route)
+
+            # Traverse all stops of this route
+            for next_stop in routes[route]:
+                if next_stop == target:
+                    return bus_count + 1
+                if next_stop not in visited_stops:
+                    visited_stops.add(next_stop)
+                    queue.append((next_stop, bus_count + 1))
+
+    return -1
+```
+### **Question 2: Crack the Safe (8 pts)**
+
+- There is a safe protected by a password. The password is a sequence of n digits where each digit can be in the range [0, k - 1]. The safe has a peculiar way of checking the password. When you enter in a sequence, it checks the most recent n digits that were entered each time you type a digit.
+- For example, the correct password is "345" and you enter in "012345":
+    - After typing 0, the most recent 3 digits is "0", which is incorrect.
+    - After typing 1, the most recent 3 digits is "01", which is incorrect.
+    - After typing 2, the most recent 3 digits is "012", which is incorrect.
+    - After typing 3, the most recent 3 digits is "123", which is incorrect.
+    - After typing 4, the most recent 3 digits is "234", which is incorrect.
+    - After typing 5, the most recent 3 digits is "345", which is correct and the safe
+unlocks.
+
+- Return any string of minimum length that will unlock the safe at some point of entering it.
+
+Example 1:
+- Input: n = 1, k = 2
+- Output: "10"
+- Explanation: The password is a single digit, so enter each digit. "01" would also unlock the safe.
+
+Example 2:
+- Input: n = 2, k = 2
+- Output: "01100"
+- Explanation: For each possible password:
+    - "00" is typed in starting from the 4th digit.
+    - "01" is typed in starting from the 1st digit.
+    - "10" is typed in starting from the 3rd digit.
+    - "11" is typed in starting from the 2nd digit.
+    Thus "01100" will unlock the safe. "10011", and "11001" would also unlock the safe.
+#### Approach:
+1. We will use algorithm to construct the sequence using a depth-first search (DFS) approach. This algorithm constructs an circuit on a graph where:
+   - Each node represents a combination of `n-1` digits.
+   - Each edge represents an additional digit, forming an `n`-digit sequence.
+2. The idea is to construct the shortest path that visits every edge exactly once, ensuring that all combinations of `n` digits appear as a subsequence in the final result.
+
+#### Steps:
+1. Initialize an empty result string and start building the sequence.
+2. Use DFS to explore all possible edges starting from a node.
+3. Append the digits from the edges visited during the traversal to construct the sequence.
+
+#### Time Complexity:
+- The time complexity is **O(k^n)**, where `k` is the number of possible digits and `n` is the length of the password.
+
+#### Space Complexity:
+- The space complexity is **O(k^n)** due to the storage needed for the graph and the result string.
+
+#### Code Solution:
+
+```python
+def crackSafe(n: int, k: int) -> str:
+    # Initialize the starting node
+    start = '0' * (n - 1)
+    visited = set()
+    result = []
+
+    def dfs(node):
+        for x in map(str, range(k)):
+            next_node = node + x
+            if next_node not in visited:
+                visited.add(next_node)
+                dfs(next_node[1:])
+                result.append(x)
+
+    dfs(start)
+    return ''.join(result) + start
 ```
