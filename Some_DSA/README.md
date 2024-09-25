@@ -510,11 +510,6 @@ def numIslands(grid: list[list[str]]) -> int:
 - For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
 - Return true if you can finish all courses. Otherwise, return false.
 - Hint: Use DFS to identify any circular dependencies in the course prerequisite structure.
-    -
-    -
-For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
-Return true if you can finish all courses. Otherwise, return false.
-Hint: Use DFS to identify any circular dependencies in the course prerequisite structure.
 
 Example 1:
 - Input: numCourses = 2, prerequisites = [[1,0]]
