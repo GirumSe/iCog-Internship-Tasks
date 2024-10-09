@@ -17,17 +17,17 @@ processing_times = [
 def calculate_makespan(schedule):
     # Machine completion times
     completion_times = np.zeros((num_machines, max(num_jobs, len(schedule))))
-    
+
     for operation in schedule:
         job, machine = operation
         start_time = completion_times[machine][0] if machine == 0 else completion_times[machine][job]
         # Ensure it starts after the previous job is done on the same machine
         if machine > 0:
             start_time = max(start_time, completion_times[machine - 1][job])
-        
+
         # Set the completion time
         completion_times[machine][job] = start_time + processing_times[job][machine]
-    
+
     return completion_times.max()  # Return the makespan
 
 # Function to generate a random schedule (chromosome)
@@ -88,7 +88,19 @@ def genetic_algorithm(population_size=100, generations=100, mutation_rate=0.1):
     best_makespan = fitness(best_schedule)
     return best_schedule, best_makespan
 
+# Function to convert schedule to readable format
+def readable_schedule(schedule):
+    readable = []
+    for job, machine in schedule:
+        readable.append(f"Job {job + 1} on Machine {machine + 1}")
+    return readable
+
 # Testing the implementation
 best_schedule, best_makespan = genetic_algorithm()
-print("Best Schedule (Job, Machine):", best_schedule)
-print("Best Makespan (Total Time):", best_makespan)
+
+# Output results
+print("\n*** Job-Shop Scheduling Results ***\n")
+print("Best Schedule:")
+for operation in readable_schedule(best_schedule):
+    print(f" - {operation}")
+print(f"\nBest Makespan (Total Production Time): {best_makespan} hours")
