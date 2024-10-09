@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 # Define the number of cities
 num_cities = 5
@@ -96,9 +97,47 @@ def genetic_algorithm(population_size=100, generations=500, mutation_rate=0.1):
     best_distance = fitness(best_tour)
     return best_tour, best_distance
 
+# Function to visualize the tour with animation
+def animate_tour(tour):
+    tour_cities = np.array(cities[tour + [tour[0]]])  # Append the first city to close the loop
+    fig, ax = plt.subplots(figsize=(8, 6))
+    
+    # Plot the cities
+    ax.scatter(cities[:, 0], cities[:, 1], color='red')
+    
+    # Add labels to each city
+    for i, (x, y) in enumerate(cities):
+        ax.text(x, y, f'City {i}', fontsize=12, ha='right')
+
+    # Initialize line
+    line, = ax.plot([], [], color='blue', lw=2, marker='o')
+    
+    # Setting limits
+    ax.set_xlim(-1, 7)
+    ax.set_ylim(-1, 4)
+    
+    # Function to update the plot for each frame
+    def update(frame):
+        if frame == len(tour):
+            return line,
+        line.set_data(tour_cities[:frame + 1, 0], tour_cities[:frame + 1, 1])
+        return line,
+
+    # Create the animation
+    ani = animation.FuncAnimation(fig, update, frames=len(tour), repeat=True)
+    
+    plt.title("Traveling Salesman Tour Animation")
+    plt.xlabel("X Coordinate")
+    plt.ylabel("Y Coordinate")
+    plt.grid()
+    plt.show()
+
 # Testing the implementation
 best_tour, best_distance = genetic_algorithm()
 
 # Output results
 print("Best Tour:", best_tour)
 print("Best Distance:", best_distance)
+
+# Animate the tour
+animate_tour(best_tour)
